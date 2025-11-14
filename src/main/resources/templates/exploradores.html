@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Exploradores </title>
+  <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+</head>
+<body>
+
+<h2>Exploradores</h2>
+<button id="btnReclutar">Reclutar</button>
+<div id="agentes" style="display:flex; flex-wrap:wrap;"></div>
+
+<div id="modal" style="display:none; position:fixed; top:10%; left:10%;
+width:80%; height:80%; border:1px solid black; background:white; overflow:auto;">
+  <pre id="modal-content"></pre>
+  <button onclick="$('#modal').hide()">Cerrar</button>
+</div>
+
+<script>
+  // script para crear historia aleatoria
+  function crearHistoria(nombre){
+    const historias = [
+      `${nombre} aprueba todos los cursos en que se matricula xd`,
+      `${nombre} no bikea propa`,
+      `${nombre} va a las clases de yarlenque.`,
+      `${nombre} Acaba la carrera.`,
+      `${nombre} No patea circuitos.`,
+    ];
+    return historias[Math.floor(Math.random()*historias.length)];
+  }
+  // funciona agregar persona
+  function agregarAgente(data){
+    const u = data.results[0];
+    const nombre = u.name.first + " " + u.name.last;
+    const historia = crearHistoria(nombre);
+
+    const card = $(`
+        <div style="border:1px solid gray; margin:5px; padding:5px; width:200px;">
+            <img src="${u.picture.large}" width="150">
+            <p><b>${nombre}</b></p>
+            <p>País: ${u.location.country}</p>
+            <p>Email: ${u.email}</p>
+            <p><i>${historia}</i></p>
+
+            <button class="eliminar">Eliminar</button>
+        </div>
+    `);
+
+    // elimianr
+    card.find(".eliminar").on("click", function(){
+      card.remove();
+    });
+
+    // le modal
+    card.on("click", function(e){
+      if(e.target.classList.contains("eliminar")) return;
+
+      $("#modal-content").text(JSON.stringify(u, null, 2));
+      $("#modal").show();
+    });
+
+    $("#agentes").append(card);
+  }
+
+  // los 10 randoms
+  $.get("https://randomuser.me/api/?results=10", function(data){
+    data.results.forEach(u => agregarAgente({results:[u]}));
+  });
+
+  // recultar
+  $("#btnReclutar").on("click", function(){
+    $.get("https://randomuser.me/api/", function(data){
+      agregarAgente(data);
+    });
+  });
+</script>
+</body>
+</html>
