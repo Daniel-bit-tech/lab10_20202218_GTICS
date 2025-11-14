@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Multiversus</title>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+</head>
+<body>
+<h2>Rick and Morty</h2>
+<div id ="rick">  </div>
+<h2>pokemon</h2>
+<div id ="pokemon">  </div>
+
+<div id="modal" style="display:none; position:fixed; top:10%; left:10%;
+     width:80%; height:80%; background:white; border:1px solid black; overflow:auto;">
+    <pre id="modal-content"></pre>
+    <button onclick="$('#modal').hide()">Cerrar</button>
+</div>
+
+
+<script>
+    // primera api
+    $.get("https://rickandmortyapi.com/api/character?page=1", function(data){
+        let html = "";
+        data.results.slice(0,20).forEach(p => {
+            html += `
+          <div style="border:1px solid gray; margin:5px; padding:5px; width:200px; cursor:pointer"
+               onclick='showModal(${JSON.stringify(p)})'>
+            <img src="${p.image}" width="150">
+            <p>${p.name}</p>
+            <p>Rick & Morty</p>
+          </div>
+        `;
+        });
+        $("#rick").html(html);
+    });
+
+
+    // segunda api
+    $.get("https://pokeapi.co/api/v2/pokemon?limit=20&offset=0", function(data){
+        let html = "";
+        data.results.forEach(p => {
+            $.get(p.url, function(det){
+                html += `
+              <div style="border:1px solid gray; margin:5px; padding:5px; width:200px; cursor:pointer"
+                   onclick='showModal(${JSON.stringify(det)})'>
+                <img src="${det.sprites.front_default}" width="150">
+                <p>${det.name}</p>
+                <p>Pokémon</p>
+              </div>
+            `;
+                $("#pokemon").html(html);
+            });
+        });
+
+    });
+
+    // modal
+    function showModal(obj){
+        $("#modal-content").text(JSON.stringify(obj, null, 2));
+        $("#modal").show();
+    }
+
+</script>
+</body>
+</html>
